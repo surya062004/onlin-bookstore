@@ -3,79 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Books</title>
+    <title>All Books</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
-<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="/">📚 BookStore Admin</a>
+        <a class="navbar-brand" href="/">📚 BookStore</a>
         <div class="navbar-nav ms-auto">
-            <a class="nav-link" href="/admin/dashboard">Dashboard</a>
-            <form method="POST" action="/logout" style="display:inline">
-                @csrf
-                <button class="btn btn-outline-light btn-sm ms-2">Logout</button>
-            </form>
+            <a class="nav-link" href="/books">Books</a>
+            <a class="nav-link" href="/login">Admin Login</a>
         </div>
     </div>
 </nav>
 
-<div class="container my-5">
-    <div class="d-flex justify-content-between align-items-center">
-        <h2>Manage Books</h2>
-        <a href="/admin/books/create" class="btn btn-success">+ Add New Book</a>
-    </div>
-    <hr>
+<div class="container my-4">
+    <form method="GET" action="/books">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control"
+                   placeholder="Search books..." value="{{ request('search') }}">
+            <button class="btn btn-primary">Search</button>
+        </div>
+    </form>
+</div>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    <table class="table table-bordered mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Price</th>
-                <th>Category</th>
-                <th>Available</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($books as $book)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $book->title }}</td>
-                <td>{{ $book->author }}</td>
-                <td>₹{{ $book->price }}</td>
-                <td>{{ $book->category->name ?? 'N/A' }}</td>
-                <td>
+<div class="container mb-5">
+    <h2>All Books</h2>
+    <div class="row">
+        @forelse($books as $book)
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <img src="https://via.placeholder.com/200x300?text=No+Image" class="card-img-top" style="height:200px;object-fit:cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ $book->title }}</h5>
+                    <p class="text-muted">{{ $book->author }}</p>
+                    <p class="text-success fw-bold">Rs.{{ $book->price }}</p>
                     <span class="badge {{ $book->is_available ? 'bg-success' : 'bg-danger' }}">
-                        {{ $book->is_available ? 'Yes' : 'No' }}
+                        {{ $book->is_available ? 'Available' : 'Not Available' }}
                     </span>
-                </td>
-                <td>
-                    <a href="/admin/books/{{ $book->id }}/edit" class="btn btn-warning btn-sm">Edit</a>
-                    <form method="POST" action="/admin/books/{{ $book->id }}" style="display:inline">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="7" class="text-center">No books found!</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    {{ $books->links() }}
+                    <br><br>
+                    <a href="/books/{{ $book->id }}" class="btn btn-primary btn-sm">View Details</a>
+                </div>
+            </div>
+        </div>
+        @empty
+        <p>No books found!</p>
+        @endforelse
+    </div>
+    <div class="mt-4">
+        {{ $books->links() }}
+    </div>
 </div>
 
 <footer class="bg-dark text-white text-center py-3">

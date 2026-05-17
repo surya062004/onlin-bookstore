@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Book Store</title>
+    <title>All Books</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
-<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="/">📚 BookStore</a>
@@ -19,58 +18,41 @@
     </div>
 </nav>
 
-<!-- Hero Section -->
-<div class="bg-primary text-white py-5 text-center">
-    <h1>Welcome to Online Book Store</h1>
-    <p>Find your favourite books here!</p>
-    <a href="/books" class="btn btn-light btn-lg">Browse Books</a>
+<div class="container my-4">
+    <form method="GET" action="/books">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control"
+                   placeholder="Search books..." value="{{ request('search') }}">
+            <button class="btn btn-primary">Search</button>
+        </div>
+    </form>
 </div>
 
-<!-- Our Books -->
-<div class="container my-5">
-    <h2>Latest Books</h2>
+<div class="container mb-5">
+    <h2>All Books</h2>
     <div class="row">
         @forelse($books as $book)
         <div class="col-md-3 mb-4">
             <div class="card h-100">
-                @if($book->cover_image)
-                    <img src="{{ asset('storage/'.$book->cover_image) }}" class="card-img-top" style="height:200px;object-fit:cover;">
-                @else
-                    <img src="https://via.placeholder.com/200x300?text=No+Image" class="card-img-top" style="height:200px;object-fit:cover;">
-                @endif
+                <img src="https://via.placeholder.com/200x300?text=No+Image" class="card-img-top" style="height:200px;object-fit:cover;">
                 <div class="card-body">
                     <h5 class="card-title">{{ $book->title }}</h5>
-                    <p class="card-text text-muted">{{ $book->author }}</p>
-                    <p class="text-success fw-bold">₹{{ $book->price }}</p>
+                    <p class="text-muted">{{ $book->author }}</p>
+                    <p class="text-success fw-bold">Rs.{{ $book->price }}</p>
+                    <span class="badge {{ $book->is_available ? 'bg-success' : 'bg-danger' }}">
+                        {{ $book->is_available ? 'Available' : 'Not Available' }}
+                    </span>
+                    <br><br>
                     <a href="/books/{{ $book->id }}" class="btn btn-primary btn-sm">View Details</a>
                 </div>
             </div>
         </div>
         @empty
-        <p>No books available yet!</p>
+        <p>No books found!</p>
         @endforelse
     </div>
-</div>
-
-<!-- Google Books API Section -->
-<div class="bg-light py-5">
-    <div class="container">
-        <h2>Featured from Google Books</h2>
-        <div class="row">
-            @foreach($apiBooks as $book)
-            <div class="col-md-3 mb-4">
-                <div class="card h-100">
-                    @if(isset($book['volumeInfo']['imageLinks']['thumbnail']))
-                        <img src="{{ $book['volumeInfo']['imageLinks']['thumbnail'] }}" class="card-img-top" style="height:200px;object-fit:cover;">
-                    @endif
-                    <div class="card-body">
-                        <h6 class="card-title">{{ $book['volumeInfo']['title'] ?? 'Unknown' }}</h6>
-                        <p class="text-muted small">{{ $book['volumeInfo']['authors'][0] ?? 'Unknown' }}</p>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
+    <div class="mt-4">
+        {{ $books->links() }}
     </div>
 </div>
 
